@@ -36,6 +36,7 @@
         inset: 0;
         pointer-events: none;
         overflow: hidden;
+        z-index: 2;
       }
 
       .heart {
@@ -66,6 +67,72 @@
         }
       }
 
+      .video-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(135deg, rgba(20, 8, 18, 0.2), rgba(20, 8, 18, 0.28)),
+          radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.42), transparent 16%),
+          radial-gradient(circle at 72% 26%, rgba(255, 223, 232, 0.52), transparent 20%),
+          radial-gradient(circle at 58% 70%, rgba(255, 178, 197, 0.54), transparent 18%),
+          linear-gradient(135deg, #1d0d1b 0%, #3f1a2d 28%, #892d4f 58%, #d74d74 100%);
+      }
+
+      .video-bg video,
+      .video-bg .video-fallback {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        pointer-events: none;
+      }
+
+      .video-bg video {
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .video-bg .video-fallback {
+        opacity: 1;
+        background-image:
+          linear-gradient(135deg, rgba(20, 8, 18, 0.2), rgba(20, 8, 18, 0.28)),
+          radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.42), transparent 16%),
+          radial-gradient(circle at 72% 26%, rgba(255, 223, 232, 0.52), transparent 20%),
+          radial-gradient(circle at 58% 70%, rgba(255, 178, 197, 0.54), transparent 18%),
+          linear-gradient(135deg, #1d0d1b 0%, #3f1a2d 28%, #892d4f 58%, #d74d74 100%);
+        background-size: cover;
+        background-position: center;
+        transition: opacity 0.4s ease;
+      }
+
+      .video-bg.has-video video {
+        opacity: 1;
+      }
+
+      .video-bg.has-video .video-fallback {
+        opacity: 0;
+      }
+
+      .video-bg.is-fallback video {
+        opacity: 0;
+      }
+
+      .video-bg.is-fallback .video-fallback {
+        opacity: 1;
+      }
+
+      .video-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        background: rgba(17, 7, 12, 0.34);
+        pointer-events: none;
+      }
+
       .screen {
         position: fixed;
         inset: 0;
@@ -74,7 +141,7 @@
         justify-content: center;
         padding: 24px;
         transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.6s ease;
-        z-index: 1;
+        z-index: 3;
       }
 
       .login-screen {
@@ -244,7 +311,9 @@
       }
 
       .love-panel {
-        width: min(90vw, 720px);
+        width: min(94vw, 860px);
+        max-height: 82vh;
+        overflow-y: auto;
         padding: 42px 34px 32px;
         border-radius: 30px;
         background: rgba(255, 255, 255, 0.72);
@@ -276,7 +345,7 @@
 
       .message {
         margin: 0 auto 20px;
-        max-width: 550px;
+        max-width: 700px;
         font-size: 1.08rem;
         line-height: 1.9;
         color: rgba(88, 38, 52, 0.9);
@@ -321,6 +390,14 @@
     </style>
   </head>
   <body>
+    <div class="video-bg" id="videoBg" aria-hidden="true">
+      <video id="bgVideo" autoplay muted loop playsinline>
+        <source src="background.mp4" type="video/mp4" />
+      </video>
+      <div class="video-fallback" id="videoFallback" aria-hidden="true"></div>
+    </div>
+    <div class="video-overlay" aria-hidden="true"></div>
+
     <div class="background" aria-hidden="true">
       <span class="heart">❤</span>
       <span class="heart">❤</span>
@@ -368,12 +445,18 @@
     <section class="screen love-screen" id="loveScreen" aria-label="Love letter screen">
       <main class="love-panel">
         <div class="badge">To My Love</div>
-        <h1>Every day with you is beautiful.</h1>
-        <p class="message">
-          You are my favorite smile, my warmest comfort, and the sweetest part of my life.
-          Thank you for being the light that makes even my ordinary days feel magical.
-          I love you more than words can say, and I will always cherish every moment with you.
-        </p>
+        <h1>OBIM</h1>
+        <div class="message">
+          <p>My baby,</p>
+          <p>I have so much I want to tell you. Honestly, if I start talking now, I don't even know when I'll stop. There are so many things in my head and so many things I want to say to you, but I'll keep them for after your exams.</p>
+          <p>For now, I just want you to focus on your exams, baby. That's your main priority. Give it your best because I know you can do it, and I'll be here rooting for you.</p>
+          <p>When you're finally done with your exams, I have a lot to say. So just prepare yourself because I'm definitely going to talk.</p>
+          <p>But honestly, I miss you. I'm tired of seeing your face only on my phone every day. I want to see you in person, sit beside you, look at you, laugh with you, and just enjoy having you close to me.</p>
+          <p>I can't wait to see you, baby. I really can't.</p>
+          <p>I love you so much. Even though I have a lot to say, I'll let you focus for now.</p>
+          <p>Go and smash those exams for me, my love.</p>
+          <p>Good morning , baby. have a nice day. I miss you. I love you. And I can't wait to see you.</p>
+        </div>
 
         <div class="heart-big">❤</div>
 
@@ -386,6 +469,45 @@
       const loginScreen = document.getElementById('loginScreen');
       const loveScreen = document.getElementById('loveScreen');
       const loginError = document.getElementById('loginError');
+      const videoBg = document.getElementById('videoBg');
+      const bgVideo = document.getElementById('bgVideo');
+
+      function useFallbackBackground() {
+        videoBg.classList.remove('has-video');
+        videoBg.classList.add('is-fallback');
+      }
+
+      if (bgVideo) {
+        const supportsMp4 = !!bgVideo.canPlayType && bgVideo.canPlayType('video/mp4') !== '';
+
+        if (!supportsMp4) {
+          useFallbackBackground();
+        } else {
+          bgVideo.setAttribute('playsinline', 'true');
+          bgVideo.setAttribute('muted', 'true');
+          bgVideo.setAttribute('autoplay', 'true');
+          bgVideo.setAttribute('loop', 'true');
+
+          bgVideo.play().catch(function () {
+            useFallbackBackground();
+          });
+
+          bgVideo.addEventListener('error', function () {
+            useFallbackBackground();
+          }, { once: true });
+
+          bgVideo.addEventListener('canplay', function () {
+            videoBg.classList.remove('is-fallback');
+            videoBg.classList.add('has-video');
+          }, { once: true });
+
+          setTimeout(function () {
+            if (bgVideo.readyState < 2) {
+              useFallbackBackground();
+            }
+          }, 2000);
+        }
+      }
 
       loginForm.addEventListener('submit', function (event) {
         event.preventDefault();
